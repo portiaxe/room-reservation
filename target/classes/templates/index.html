@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"  
+      ng-app="calendarDemoApp" 
+     >
+<head>
+    <meta charset="UTF-8"/>
+	
+    <title>Room Reservation | Personiv</title>
+	<base href="/RoomReservation/"></base>
+	
+    <link href="/RoomReservation/app/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/RoomReservation/app/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet" />
+    <link href="/RoomReservation/app/css/sb-admin-2.css" rel="stylesheet" />
+    <link href="/RoomReservation/app/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="/RoomReservation/bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet" />
+    <link href="/RoomReservation/app/css/main.css" rel="stylesheet" />
+</head>
+<body>
+	<div id="wrapper">
+		 <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">SB Admin v2.0</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+            
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+        </nav>
+	<div id="page-wrapper" ng-controller="CalendarCtrl" >
+		<div class ="row">
+			<div>
+				<div ng-repeat="re in events">{{re.start | date:'MMM dd yyyy HH:mma'}} - {{re.end | date:'MMM dd yyyy HH:mma'}}</div>
+			</div>
+			<div class ="col col-md5"> 
+			<div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources"></div> 
+					<!--<div class="calendar"></div> 
+			 <div ui-calendar="uiConfig.calendar" ng-model="eventSources" calendar="reservationCalendar"></div> 
+			-->
+			</div>
+		</div> 
+	</div>
+		
+	</div>
+	<!--<div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources"></div> --> 
+	
+	<script src ="/RoomReservation/bower_components/jquery/dist/jquery.min.js" ></script>
+	<script src ="/RoomReservation/app/bower_components/bootstrap/dist/js/bootstrap.min.js" ></script>
+	<script src ="/RoomReservation/app/bower_components/metisMenu/dist/metisMenu.min.js"></script> 
+	<script src ="/RoomReservation/app/js/sb-admin-2.js"></script> 
+	
+	<script src ="/RoomReservation/bower_components/moment/min/moment.min.js" ></script>
+	<script src ="/RoomReservation/bower_components/fullcalendar/dist/fullcalendar.min.js" ></script>
+	<script src ="/RoomReservation/bower_components/fullcalendar/dist/gcal.js" ></script>
+	
+	
+	<script src ="/RoomReservation/bower_components/angular/angular.min.js" ></script>
+	<script src ="/RoomReservation/app/bower_components/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js" ></script>
+	<script src ="/RoomReservation/app/js/calendar.js" ></script>
+	
+	
+	<script>
+	angular.module('calendarDemoApp', ['ui.calendar', 'ui.bootstrap']);
+	angular.module('calendarDemoApp').factory('ReservationDataOp',function($http){
+		var ReservationDataOp ={};
+		
+		ReservationDataOp
+			.getReservations = function(){
+			return $http({
+				method:'GET',
+				url: '/RoomReservation/reservations'
+			});
+		}
+			
+		return ReservationDataOp;
+	});
+	angular.module('calendarDemoApp').controller('CalendarCtrl',function($scope,$compile,uiCalendarConfig,ReservationDataOp) {
+	    var date = new Date();
+	    var d = date.getDate();
+	    var m = date.getMonth();
+	    var y = date.getFullYear();
+	    
+	    $scope.changeTo = 'Hungarian';
+	   
+	    /* event source that contains custom events on the scope */
+	    $scope.events = [
+	      {title: 'All Day Event',start: new Date(y, m, 1)},
+	      {title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
+	      {id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
+	      {id: 999,title: 'Repeating Event',start: new Date(y, m, d + 4, 16, 0),allDay: false},
+	      {title: 'Birthday Party',start: new Date(y, m, d + 1, 19, 0),end: new Date(y, m, d + 1, 22, 30),allDay: false},
+	      {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29)}
+	    ];
+	    
+	    $scope.events =[];
+	    $scope.eventSources = [];
+	    
+	    ReservationDataOp
+	    	.getReservations()
+	    	.then(function(response){
+	    		console.log(response);
+	    		
+	    		//$scope.eventSources.splice(0,1);
+	    		
+	    		evt = response.data;
+	    		
+	    		evt.forEach(function(obj){
+	    			
+	    			$scope.events.push({
+	    				title: obj.title,
+	    				start: new Date(obj.start),
+	    				end: new Date(obj.end)
+	    			});
+	    		});
+	    		//$scope.eventSources.push(approved);
+	    	})
+	    	.catch(function(error){
+	    		console.log(error);
+	    	});
+	    
+	    /* event source that calls a function on every view switch */
+	    $scope.eventsF = function (start, end, timezone, callback) {
+	      var s = new Date(start).getTime() / 1000;
+	      var e = new Date(end).getTime() / 1000;
+	      var m = new Date(start).getMonth();
+	      var events = [{title: 'Feed Me ' + m,start: s + (50000),end: s + (100000),allDay: false, className: ['customFeed']}];
+	      callback(events);
+	    };
+
+	    $scope.calEventsExt = {
+	       color: '#f00',
+	       textColor: 'yellow',
+	       events: [ 
+	          {type:'party',title: 'Lunch',start: new Date(y, m, d, 12, 0),end: new Date(y, m, d, 14, 0),allDay: false},
+	          {type:'party',title: 'Lunch 2',start: new Date(y, m, d, 12, 0),end: new Date(y, m, d, 14, 0),allDay: false},
+	          {type:'party',title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
+	        ]
+	    };
+	    
+	    $scope.eventSources.push($scope.calEventsExt);
+	    
+	    /* alert on eventClick */
+	    $scope.alertOnEventClick = function( date, jsEvent, view){
+	        $scope.alertMessage = (date.title + ' was clicked ');
+	        console.log(date);
+	       
+	    };
+	    /* alert on Drop */
+	     $scope.alertOnDrop = function(event, delta, revertFunc, jsEvent, ui, view){
+	       $scope.alertMessage = ('Event Droped to make dayDelta ' + delta);
+	       console.log(event);
+	    };
+	    /* alert on Resize */
+	    $scope.alertOnResize = function(event, delta, revertFunc, jsEvent, ui, view ){
+	       $scope.alertMessage = ('Event Resized to make dayDelta ' + delta);
+	    };
+	    /* add and removes an event source of choice */
+	    $scope.addRemoveEventSource = function(sources,source) {
+	      var canAdd = 0;
+	      angular.forEach(sources,function(value, key){
+	        if(sources[key] === source){
+	          sources.splice(key,1);
+	          canAdd = 1;
+	        }
+	      });
+	      if(canAdd === 0){
+	        sources.push(source);
+	      }
+	    };
+	    /* add custom event*/
+	    $scope.addEvent = function() {
+	      $scope.events.push({
+	        title: 'Open Sesame',
+	        start: new Date(y, m, 28,4,0,0),
+	        end: new Date(y, m, 29,4,0,0),
+	        className: ['openSesame']
+	      });
+	    };
+	    /* remove event */
+	    $scope.remove = function(index) {
+	      $scope.events.splice(index,1);
+	    };
+	    /* Change View */
+	    $scope.changeView = function(view,calendar) {
+	      uiCalendarConfig.calendars[calendar].fullCalendar('changeView',view);
+	    };
+	    /* Change View */
+	    $scope.renderCalender = function(calendar) {
+	      if(uiCalendarConfig.calendars[calendar]){
+	        uiCalendarConfig.calendars[calendar].fullCalendar('render');
+	      }
+	    };
+	     /* Render Tooltip */
+	    $scope.eventRender = function( event, element, view ) { 
+	        element.attr({'tooltip': event.title,
+	                     'tooltip-append-to-body': true});
+	        $compile(element)($scope);
+	    };
+	    /* config object */
+	    $scope.uiConfig = {
+	      calendar:{
+	        height: 450,
+	        editable: true,
+	        nextDayThreshold :"00:00:00",
+	        header:{
+	        	left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+	        },
+	        eventClick: $scope.alertOnEventClick,
+	        eventDrop: $scope.alertOnDrop,
+	        eventResize: $scope.alertOnResize,
+	        eventRender: $scope.eventRender
+	      }
+	    };
+
+	    $scope.changeLang = function() {
+	      if($scope.changeTo === 'Hungarian'){
+	        $scope.uiConfig.calendar.dayNames = ["Vasárnap", "Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat"];
+	        $scope.uiConfig.calendar.dayNamesShort = ["Vas", "Hét", "Kedd", "Sze", "Csüt", "Pén", "Szo"];
+	        $scope.changeTo= 'English';
+	      } else {
+	        $scope.uiConfig.calendar.dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	        $scope.uiConfig.calendar.dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+	        $scope.changeTo = 'Hungarian';
+	      }
+	    };
+	    /* event sources array*/
+	    $scope.eventSources = [$scope.events,$scope.calEventsExt];
+	   // $scope.eventSources2 = [$scope.calEventsExt, $scope.eventsF, $scope.events];
+	    $scope.eventSources2 = [$scope.calEventsExt,$scope.eventSource, $scope.events];
+		
+	   // $scope.addEvent();
+	});
+	</script>
+
+</body>
+</html>
