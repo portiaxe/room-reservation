@@ -64,7 +64,8 @@ public class WebSecurityConfig  extends WebSecurityConfigurerAdapter{
 					    "/password/**",
 					    "/departments/**",
 					    "/fonts/**",
-					    "/reservation/**"
+					    "/reservation/**",
+					    "/upload/**"
 					    ).permitAll()
 			.antMatchers("/user/**").hasAuthority("ADMIN").and()
 			// disabling the basic authentication
