@@ -12,8 +12,8 @@
    mail:
       host: mail.personive.com
       port: 26
-      username: "employeeReferral@personive.com"
-      password: "!welcome10"
+      username:
+      password: 
       properties: 
         mail: 
           debug: true
